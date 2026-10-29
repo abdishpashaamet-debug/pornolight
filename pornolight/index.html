@@ -19,24 +19,102 @@
   </div>
 </div>
 
-<header>
-  <div class="logo">Velvet<b>Tube</b></div>
-  <form class="search" id="sf" role="search">
-    <input id="q" type="search" placeholder="Поиск видео" aria-label="Поиск видео">
-    <button type="submit">Найти</button>
-  </form>
-  <button class="btn" type="button">Войти</button>
-  <button class="btn" id="register-open" type="button" style="background:var(--accent);color:var(--accent-ink)">Регистрация</button>
-</header>
-<nav id="tabs" aria-label="Категории"></nav>
+<div class="app-shell">
+  <header class="topbar">
+    <div class="brand" aria-label="VelvetTube">
+      <span class="brand-mark">V</span>
+      <span>Velvet<span>Tube</span></span>
+    </div>
 
-<main>
-  <h2 id="title">Новое</h2>
-  <div class="grid" id="grid"></div>
-  <p class="empty hidden" id="empty">Ничего не найдено. Измените запрос или выберите другую категорию.</p>
-</main>
+    <nav class="nav-links" aria-label="Главная навигация">
+      <button type="button" class="nav-link active">Главная</button>
+      <button type="button" class="nav-link">Подписки</button>
+      <button type="button" class="nav-link">Топ</button>
+      <button type="button" class="nav-link">HD</button>
+    </nav>
 
-<footer>Шаблон интерфейса. Контент — заглушки. © Velvet · 18+</footer>
+    <form class="search" id="sf" role="search">
+      <input id="q" type="search" placeholder="Поиск видео" aria-label="Поиск видео">
+      <button type="submit">Найти</button>
+    </form>
+
+    <div class="header-actions">
+      <button class="btn btn-ghost" type="button">Войти</button>
+      <button class="btn btn-primary" id="register-open" type="button">Регистрация</button>
+    </div>
+  </header>
+
+  <section class="hero">
+    <div class="hero-copy">
+      <p class="eyebrow">Премиальный каталог</p>
+      <h1>Только самое яркое. Только для взрослых.</h1>
+      <p class="hero-text">Горячие релизы, тематические подборки и эксклюзивный контент в одном месте — для тех, кто ценит качество и атмосферу.</p>
+      <div class="hero-actions">
+        <button class="btn btn-primary large" type="button" id="hero-play">Смотреть сейчас</button>
+        <button class="btn btn-ghost large" type="button" id="hero-categories">Категории</button>
+      </div>
+      <div class="stats" aria-label="Статистика платформы">
+        <div>
+          <strong>24k+</strong>
+          <span>релизов</span>
+        </div>
+        <div>
+          <strong>4.9/5</strong>
+          <span>оценка</span>
+        </div>
+        <div>
+          <strong>18+</strong>
+          <span>только для взрослых</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="hero-feature" id="featured" aria-live="polite">
+      <div class="feature-badge" id="featured-badge">HD · 4K</div>
+      <div class="feature-poster" id="featured-poster"></div>
+      <div class="feature-info">
+        <div class="meta-row">
+          <span class="dot"></span>
+          <span id="featured-category">Новое</span>
+          <span id="featured-duration">38:12</span>
+        </div>
+        <h2 id="featured-title">Ночной эфир</h2>
+        <p id="featured-desc">Подборка лучших сцен, ярких моментов и атмосферных релизов в стиле premium-платформы.</p>
+        <div class="feature-controls">
+          <button class="chip primary" id="featured-action" type="button">Смотреть</button>
+          <button class="chip" id="featured-more" type="button">Подробнее</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <nav id="tabs" class="tabs" aria-label="Категории"></nav>
+
+  <main class="content">
+    <section class="section-heading">
+      <div>
+        <p class="eyebrow">Каталог</p>
+        <h2 id="title">Новое</h2>
+      </div>
+      <button class="btn btn-ghost small" type="button">Показать всё</button>
+    </section>
+
+    <div class="grid" id="grid"></div>
+    <p class="empty hidden" id="empty">Ничего не найдено. Измените запрос или выберите другую категорию.</p>
+
+    <section class="secondary-panel">
+      <div class="panel-header">
+        <div>
+          <p class="eyebrow">Сообщество</p>
+          <h3>Топ авторов</h3>
+        </div>
+      </div>
+      <div class="creator-list" id="creator-list"></div>
+    </section>
+  </main>
+
+  <footer>Шаблон интерфейса. Контент — заглушки. © Velvet · 18+</footer>
+</div>
 
 <dialog id="dlg">
   <div class="player" id="pl">Здесь будет видеоплеер</div>
@@ -46,7 +124,6 @@
     <div style="margin-top:14px"><button class="btn" id="close" type="button">Закрыть</button></div>
   </div>
 </dialog>
-
 
 <dialog id="register-dialog" aria-labelledby="register-title">
   <form class="register-form" id="register-form">
@@ -66,6 +143,7 @@
     <p class="register-note">Демонстрационная форма: аккаунт и пароль не сохраняются.</p>
   </form>
 </dialog>
+
 <script src="assets/js/app.js" defer></script>
 </body>
 </html>
