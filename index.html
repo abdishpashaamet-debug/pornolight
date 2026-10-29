@@ -1,0 +1,906 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Velvet — видеоплатформа 18+</title>
+  <style>
+    :root {
+      --bg: #0b0b0d;
+      --bg-2: #131316;
+      --panel: rgba(22, 22, 26, 0.9);
+      --panel-strong: #1b1b20;
+      --line: rgba(255,255,255,0.08);
+      --line-strong: rgba(255,255,255,0.15);
+      --text: #f5f5f5;
+      --muted: #a0a0a6;
+      --accent: #ff9f1c;
+      --accent-2: #ffb84d;
+      --accent-ink: #130f0a;
+      --shadow: 0 16px 32px rgba(0,0,0,.35);
+      --radius: 18px;
+      --container: 1400px;
+      color-scheme: dark;
+      --safe-top: env(safe-area-inset-top, 0px);
+      --safe-bottom: env(safe-area-inset-bottom, 0px);
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      font-family: "Inter", "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+      background: radial-gradient(circle at top, rgba(255, 159, 28, 0.14), transparent 24%), linear-gradient(180deg, #09090b 0%, #0f0f12 100%);
+      color: var(--text);
+      line-height: 1.4;
+      min-height: 100vh;
+    }
+    a { color: inherit; text-decoration: none; }
+    button, input { font: inherit; }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      border: 1px solid var(--line-strong);
+      background: rgba(255,255,255,0.02);
+      color: var(--text);
+      padding: 10px 16px;
+      border-radius: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: transform .18s ease, border-color .18s ease, background .18s ease;
+    }
+    .btn:hover { transform: translateY(-1px); }
+    .btn.primary {
+      background: linear-gradient(135deg, var(--accent) 0%, var(--accent-2) 100%);
+      border-color: transparent;
+      color: var(--accent-ink);
+      box-shadow: 0 10px 24px rgba(255, 159, 28, 0.35);
+    }
+    .btn.ghost { background: transparent; }
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      margin: -1px;
+      padding: 0;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      border: 0;
+    }
+
+    .app { max-width: var(--container); margin: 0 auto; padding: 0 18px 40px; }
+
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      backdrop-filter: blur(14px);
+      background: rgba(11,11,13,.8);
+      border-bottom: 1px solid var(--line);
+      padding-top: var(--safe-top);
+    }
+    .header-inner {
+      max-width: var(--container);
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 14px 18px;
+    }
+    .logo {
+      font-weight: 900;
+      font-size: clamp(1.4rem, 2vw, 2rem);
+      letter-spacing: -0.06em;
+      white-space: nowrap;
+    }
+    .logo b {
+      background: linear-gradient(135deg, var(--accent) 0%, #ffca69 100%);
+      color: var(--accent-ink);
+      padding: 2px 9px 4px;
+      border-radius: 8px;
+      margin-left: 4px;
+      display: inline-block;
+    }
+
+    .search-wrap {
+      flex: 1;
+      min-width: 180px;
+      display: flex;
+      align-items: center;
+      border: 1px solid var(--line-strong);
+      background: rgba(255,255,255,0.02);
+      border-radius: 14px;
+      overflow: hidden;
+      transition: border-color .2s ease, box-shadow .2s ease;
+    }
+    .search-wrap:focus-within {
+      border-color: rgba(255, 159, 28, 0.7);
+      box-shadow: 0 0 0 3px rgba(255, 159, 28, 0.12);
+    }
+    .search-wrap input {
+      flex: 1;
+      border: 0;
+      background: transparent;
+      color: var(--text);
+      padding: 13px 14px;
+      font-size: 0.97rem;
+      outline: none;
+    }
+    .search-wrap input::placeholder { color: var(--muted); }
+    .search-wrap button {
+      border: 0;
+      background: linear-gradient(135deg, var(--accent) 0%, var(--accent-2) 100%);
+      color: var(--accent-ink);
+      padding: 13px 18px;
+      font-weight: 800;
+      cursor: pointer;
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .nav {
+      max-width: var(--container);
+      margin: 0 auto;
+      padding: 0 18px 12px;
+      overflow-x: auto;
+      scrollbar-width: none;
+      -ms-overflow-style: none;
+    }
+    .nav::-webkit-scrollbar { display: none; }
+    .nav-list {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 0;
+      margin: 0;
+      list-style: none;
+      min-width: max-content;
+    }
+    .nav button {
+      background: rgba(255,255,255,0.02);
+      color: var(--text);
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      padding: 8px 14px;
+      font-weight: 600;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: all .2s ease;
+    }
+    .nav button.active {
+      background: linear-gradient(135deg, var(--accent) 0%, var(--accent-2) 100%);
+      color: var(--accent-ink);
+      border-color: transparent;
+      box-shadow: 0 10px 20px rgba(255, 159, 28, 0.2);
+    }
+
+    main { max-width: var(--container); margin: 0 auto; padding: 18px 0 0; }
+
+    .hero {
+      display: grid;
+      grid-template-columns: 1.3fr 0.7fr;
+      gap: 18px;
+      margin-top: 18px;
+    }
+    .hero-feature, .mini-panel {
+      background: linear-gradient(180deg, rgba(24,24,28,0.95), rgba(16,16,20,0.95));
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+    }
+    .hero-feature {
+      min-height: 330px;
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      align-items: flex-end;
+      padding: 24px;
+      isolation: isolate;
+    }
+    .hero-feature::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(180deg, rgba(0,0,0,0.18), rgba(0,0,0,0.72)), var(--feature-bg, linear-gradient(135deg, #2d1d19 0%, #181b24 100%));
+      z-index: -1;
+    }
+    .hero-content { width: min(520px, 100%); }
+    .tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      margin-bottom: 12px;
+      font-size: 0.72rem;
+      color: var(--accent-2);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      font-weight: 800;
+      background: rgba(255, 159, 28, 0.09);
+      border: 1px solid rgba(255, 159, 28, 0.18);
+      border-radius: 999px;
+      padding: 8px 12px;
+    }
+    .hero h1 {
+      margin: 0 0 10px;
+      font-size: clamp(2rem, 4vw, 3.25rem);
+      line-height: 1.03;
+      letter-spacing: -0.06em;
+    }
+    .hero-meta {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 10px;
+      color: rgba(255,255,255,0.8);
+      font-size: 0.9rem;
+      margin-bottom: 18px;
+    }
+    .hero-actions { display: flex; gap: 12px; flex-wrap: wrap; }
+
+    .mini-panel {
+      padding: 18px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      min-height: 330px;
+    }
+    .panel-title {
+      font-size: 0.82rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--muted);
+      margin: 0 0 14px;
+      font-weight: 800;
+    }
+    .mini-list { display: flex; flex-direction: column; gap: 12px; }
+    .mini-item {
+      display: grid;
+      grid-template-columns: 88px 1fr auto;
+      gap: 10px;
+      align-items: center;
+      padding: 8px 0;
+      border-bottom: 1px solid var(--line);
+    }
+    .mini-item:last-child { border-bottom: 0; }
+    .mini-thumb {
+      height: 62px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, #7a2b29, #1f2b3d);
+      border: 1px solid rgba(255,255,255,0.05);
+    }
+    .mini-item h4 {
+      margin: 0 0 3px;
+      font-size: 0.96rem;
+      font-weight: 700;
+    }
+    .mini-item small { color: var(--muted); }
+    .mini-item .pill {
+      background: rgba(255,255,255,0.03);
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      padding: 5px 8px;
+      font-size: 0.72rem;
+      color: var(--muted);
+    }
+
+    .section { margin-top: 28px; }
+    .section-head {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      justify-content: space-between;
+      margin-bottom: 16px;
+      flex-wrap: wrap;
+    }
+    .section-head h2 {
+      margin: 0;
+      font-size: clamp(1.4rem, 2vw, 1.9rem);
+      letter-spacing: -0.04em;
+      border-left: 4px solid var(--accent);
+      padding-left: 12px;
+    }
+    .section-tools {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+    .chip {
+      background: rgba(255,255,255,0.02);
+      border: 1px solid var(--line);
+      color: var(--muted);
+      border-radius: 999px;
+      padding: 8px 12px;
+      font-size: 0.85rem;
+      cursor: pointer;
+    }
+    .chip.active {
+      background: rgba(255, 159, 28, 0.08);
+      border-color: rgba(255,159,28,0.22);
+      color: var(--accent-2);
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 18px;
+    }
+    .card {
+      background: rgba(255,255,255,0.01);
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      padding: 0;
+      color: inherit;
+      text-align: left;
+      overflow: hidden;
+      cursor: pointer;
+      transition: transform .18s ease, border-color .2s ease, box-shadow .2s ease;
+      position: relative;
+    }
+    .card:hover {
+      transform: translateY(-4px);
+      border-color: rgba(255,159,28,0.28);
+      box-shadow: 0 12px 28px rgba(0,0,0,.24);
+    }
+    .thumb {
+      position: relative;
+      height: 200px;
+      background: linear-gradient(135deg, #2f2025, #0e1828);
+      overflow: hidden;
+      border-bottom: 1px solid var(--line);
+    }
+    .thumb::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(180deg, rgba(0,0,0,0.04), rgba(0,0,0,0.7));
+    }
+    .thumb-badge {
+      position: absolute;
+      left: 10px;
+      bottom: 10px;
+      z-index: 2;
+      background: rgba(0,0,0,0.7);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 6px;
+      padding: 3px 7px;
+      font-size: 0.7rem;
+      font-weight: 800;
+      color: var(--accent-2);
+      letter-spacing: 0.04em;
+    }
+    .thumb-duration {
+      position: absolute;
+      right: 10px;
+      bottom: 10px;
+      z-index: 2;
+      padding: 3px 8px;
+      background: rgba(0,0,0,0.75);
+      border-radius: 6px;
+      font-size: 0.7rem;
+      font-weight: 700;
+    }
+    .thumb-play {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background: rgba(0,0,0,0.56);
+      border: 1px solid rgba(255,255,255,0.18);
+      z-index: 2;
+      display: grid;
+      place-items: center;
+      font-size: 1.3rem;
+    }
+    .thumb-play::before {
+      content: "▶";
+      transform: translateX(2px);
+    }
+
+    .card-body { padding: 14px 14px 16px; }
+    .card-meta {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      align-items: center;
+      font-size: 0.74rem;
+      color: var(--muted);
+      margin-bottom: 8px;
+    }
+    .card h3 {
+      margin: 0;
+      font-size: 1.02rem;
+      line-height: 1.3;
+      letter-spacing: -0.02em;
+      min-height: 42px;
+    }
+    .card:hover h3 { color: var(--accent-2); }
+    .card-info {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+      margin-top: 14px;
+      color: var(--muted);
+      font-size: 0.8rem;
+    }
+    .badge-tag {
+      display: inline-flex;
+      align-items: center;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      padding: 4px 7px;
+      font-size: 0.68rem;
+      color: var(--muted);
+    }
+    .empty {
+      text-align: center;
+      color: var(--muted);
+      padding: 34px 18px;
+      border: 1px dashed var(--line-strong);
+      border-radius: 18px;
+      margin-top: 10px;
+      background: rgba(255,255,255,0.01);
+    }
+
+    footer {
+      max-width: var(--container);
+      margin: 34px auto 0;
+      padding: 0 18px 30px;
+      color: var(--muted);
+      border-top: 1px solid var(--line);
+      text-align: center;
+      font-size: 0.85rem;
+    }
+    .footer-inner {
+      padding-top: 18px;
+      display: flex;
+      justify-content: center;
+      gap: 14px;
+      flex-wrap: wrap;
+    }
+
+    .gate {
+      position: fixed;
+      inset: 0;
+      background: rgba(4, 4, 5, 0.9);
+      display: grid;
+      place-items: center;
+      padding: 20px;
+      z-index: 100;
+      backdrop-filter: blur(8px);
+      transition: opacity .25s ease, visibility .25s ease;
+    }
+    .gate.hidden {
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+    }
+    .gate-card {
+      width: min(480px, 100%);
+      background: linear-gradient(180deg, rgba(24,24,28,1), rgba(14,14,17,0.98));
+      border: 1px solid var(--line-strong);
+      border-radius: 28px;
+      box-shadow: 0 22px 60px rgba(0,0,0,.4);
+      padding: 30px 28px 24px;
+      text-align: center;
+    }
+    .gate-card .logo { margin-bottom: 18px; display: inline-block; }
+    .gate-card h1 {
+      margin: 0 0 10px;
+      font-size: clamp(1.8rem, 3vw, 2.5rem);
+      letter-spacing: -0.05em;
+    }
+    .gate-card p { margin: 0; color: var(--muted); }
+    .gate-actions {
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+      margin-top: 22px;
+      flex-wrap: wrap;
+    }
+    .small-note {
+      margin-top: 16px;
+      font-size: 0.76rem;
+      color: rgba(255,255,255,0.55);
+    }
+
+    dialog {
+      border: 0;
+      padding: 0;
+      background: transparent;
+      width: min(920px, 94vw);
+      border-radius: 22px;
+      overflow: visible;
+    }
+    dialog::backdrop {
+      background: rgba(0,0,0,0.72);
+      backdrop-filter: blur(6px);
+    }
+    .player-modal {
+      background: var(--panel-strong);
+      border: 1px solid var(--line-strong);
+      border-radius: 22px;
+      overflow: hidden;
+      box-shadow: var(--shadow);
+    }
+    .player-stage {
+      position: relative;
+      aspect-ratio: 16 / 9;
+      display: grid;
+      place-items: center;
+      background: linear-gradient(135deg, #221d1d, #0f1825);
+      color: rgba(255,255,255,0.9);
+      font-size: 1.05rem;
+      font-weight: 600;
+    }
+    .player-stage::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(180deg, rgba(0,0,0,0.14), rgba(0,0,0,0.7));
+    }
+    .player-stage-inner {
+      position: relative;
+      z-index: 1;
+      text-align: center;
+      padding: 18px;
+    }
+    .player-stage .play {
+      width: 68px;
+      height: 68px;
+      display: grid;
+      place-items: center;
+      border-radius: 50%;
+      margin: 0 auto 14px;
+      background: rgba(0,0,0,0.42);
+      border: 1px solid rgba(255,255,255,0.2);
+      font-size: 1.7rem;
+    }
+    .player-content { padding: 18px 20px 20px; }
+    .player-header {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: flex-start;
+      margin-bottom: 10px;
+      flex-wrap: wrap;
+    }
+    .player-header h3 {
+      margin: 0;
+      font-size: clamp(1.15rem, 2vw, 1.6rem);
+      letter-spacing: -0.03em;
+    }
+    .meta-line {
+      color: var(--muted);
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      font-size: 0.9rem;
+    }
+    .player-actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 18px;
+    }
+
+    @media (max-width: 980px) {
+      .hero { grid-template-columns: 1fr; }
+      .mini-panel { min-height: auto; }
+    }
+    @media (max-width: 680px) {
+      .header-inner { flex-wrap: wrap; }
+      .header-inner > * { width: 100%; }
+      .search-wrap { order: 3; }
+      .header-actions { width: auto; }
+      .grid { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); }
+      .thumb { height: 170px; }
+      .player-header { flex-direction: column; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      * { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
+    }
+  </style>
+</head>
+<body>
+  <div class="gate" id="gate" role="dialog" aria-modal="true" aria-labelledby="gate-title">
+    <div class="gate-card">
+      <div class="logo">Velvet<b>18+</b></div>
+      <h1 id="gate-title">Только для взрослых</h1>
+      <p>Сайт содержит материалы для лиц старше 18 лет. Подтвердите возраст, чтобы продолжить.</p>
+      <div class="gate-actions">
+        <button class="btn primary" id="age-confirm" type="button">Мне есть 18 лет</button>
+        <a class="btn ghost" href="about:blank">Выйти</a>
+      </div>
+      <div class="small-note">Контент предназначен только для совершеннолетних пользователей.</div>
+    </div>
+  </div>
+
+  <header>
+    <div class="header-inner">
+      <div class="logo">Velvet<b>Tube</b></div>
+
+      <form class="search-wrap" id="sf" role="search" aria-label="Поиск по видео">
+        <label class="sr-only" for="q">Поиск видео</label>
+        <input id="q" type="search" placeholder="Поиск видео" aria-label="Поиск видео">
+        <button type="submit" aria-label="Найти видео">Найти</button>
+      </form>
+
+      <div class="header-actions">
+        <button class="btn ghost" type="button">Войти</button>
+        <button class="btn primary" type="button">Регистрация</button>
+      </div>
+    </div>
+
+    <nav class="nav" aria-label="Категории">
+      <ul class="nav-list" id="tabs"></ul>
+    </nav>
+  </header>
+
+  <main class="app">
+    <section class="hero">
+      <article class="hero-feature" id="feature-card">
+        <div class="hero-content">
+          <div class="tag">Топ сегодня</div>
+          <h1 id="feature-title">Ночная съёмка</h1>
+          <div class="hero-meta">
+            <span id="feature-meta">15 тыс. просмотров</span>
+            <span>•</span>
+            <span id="feature-duration">08:42</span>
+            <span>•</span>
+            <span>HD</span>
+          </div>
+          <div class="hero-actions">
+            <button class="btn primary" id="feature-play" type="button">Смотреть</button>
+            <button class="btn ghost" type="button">Сохранить</button>
+          </div>
+        </div>
+      </article>
+
+      <aside class="mini-panel">
+        <div>
+          <h3 class="panel-title">Сейчас в эфире</h3>
+          <div class="mini-list" id="mini-list"></div>
+        </div>
+      </aside>
+    </section>
+
+    <section class="section">
+      <div class="section-head">
+        <h2 id="title">Новое</h2>
+        <div class="section-tools" id="chip-tools"></div>
+      </div>
+
+      <div class="grid" id="grid"></div>
+      <div class="empty" id="empty" hidden>Ничего не найдено. Попробуйте изменить запрос или выбрать другую категорию.</div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+      <span>Шаблон интерфейса.</span>
+      <span>Контент — заглушки.</span>
+      <span>© Velvet · 18+</span>
+    </div>
+  </footer>
+
+  <dialog id="dlg" aria-labelledby="dlg-title">
+    <div class="player-modal">
+      <div class="player-stage" id="pl">
+        <div class="player-stage-inner">
+          <div class="play">▶</div>
+          <div>Предпросмотр видео</div>
+        </div>
+      </div>
+      <div class="player-content">
+        <div class="player-header">
+          <h3 id="dlg-title">Заголовок</h3>
+          <button class="btn ghost" id="close" type="button">Закрыть</button>
+        </div>
+        <div class="meta-line" id="dlg-meta"></div>
+        <div class="player-actions">
+          <button class="btn primary" type="button">Смотреть</button>
+          <button class="btn ghost" type="button">В избранное</button>
+          <button class="btn ghost" type="button">Поделиться</button>
+        </div>
+      </div>
+    </div>
+  </dialog>
+
+  <script>
+    var CATS = ["Новое", "Популярное", "Топ недели", "HD", "Длинные", "Подборки"];
+    var FILTER_CHIPS = ["Все", "HD", "Live", "Новинки", "Топ"];
+    var VIDEOS = [];
+    (function () {
+      var names = [
+        "Закат над городом",
+        "Ночная съёмка",
+        "Первый эфир",
+        "Студийная сессия",
+        "Live-запись",
+        "Лучшее за месяц",
+        "Светлый кадр",
+        "Вечерняя прогулка",
+        "Лукбук",
+        "Премьера",
+        "Тихий вечер",
+        "Ритм после полуночи"
+      ];
+      for (var i = 0; i < 26; i++) {
+        var h = (i * 47) % 360;
+        var title = names[i % names.length] + (i >= names.length ? " " + (Math.floor(i / names.length) + 1) : "");
+        VIDEOS.push({
+          id: i,
+          title: title,
+          cat: CATS[i % CATS.length],
+          views: (Math.round(((i * 7919) % 900) + 40)) + " тыс.",
+          dur: (5 + (i * 3) % 35) + ":" + ("0" + ((i * 17) % 60)).slice(-2),
+          tag: i % 4 === 0 ? "HD" : (i % 3 === 0 ? "Live" : "Топ"),
+          hd: i % 3 === 0,
+          bg: "linear-gradient(135deg, hsl(" + h + ", 55%, 28%), hsl(" + ((h + 60) % 360) + ", 60%, 12%))",
+          featured: i === 0 || i === 7
+        });
+      }
+    })();
+
+    var state = { cat: "Новое", q: "", chip: "Все" };
+    var tabs = document.getElementById("tabs");
+    var grid = document.getElementById("grid");
+    var empty = document.getElementById("empty");
+    var chipTools = document.getElementById("chip-tools");
+    var featureCard = document.getElementById("feature-card");
+    var featureTitle = document.getElementById("feature-title");
+    var featureMeta = document.getElementById("feature-meta");
+    var featureDuration = document.getElementById("feature-duration");
+    var miniList = document.getElementById("mini-list");
+
+    function renderTabs() {
+      tabs.innerHTML = "";
+      CATS.forEach(function (c) {
+        var li = document.createElement("li");
+        var b = document.createElement("button");
+        b.type = "button";
+        b.textContent = c;
+        b.className = c === state.cat ? "active" : "";
+        b.setAttribute("aria-pressed", String(c === state.cat));
+        b.addEventListener("click", function () {
+          state.cat = c;
+          render();
+        });
+        li.appendChild(b);
+        tabs.appendChild(li);
+      });
+    }
+
+    function renderChips() {
+      chipTools.innerHTML = "";
+      FILTER_CHIPS.forEach(function (chip) {
+        var button = document.createElement("button");
+        button.type = "button";
+        button.textContent = chip;
+        button.className = "chip" + (state.chip === chip ? " active" : "");
+        button.addEventListener("click", function () {
+          state.chip = chip;
+          render();
+        });
+        chipTools.appendChild(button);
+      });
+    }
+
+    function getFilteredVideos() {
+      var query = state.q.trim().toLowerCase();
+      return VIDEOS.filter(function (v) {
+        var matchesQuery = !query || v.title.toLowerCase().indexOf(query) > -1 || v.cat.toLowerCase().indexOf(query) > -1;
+        var matchesCategory = state.cat === "Новое" ? true : v.cat === state.cat;
+        var matchesChip = state.chip === "Все" || (state.chip === "HD" && v.hd) || (state.chip === "Live" && v.tag === "Live") || (state.chip === "Новинки" && v.id < 8) || (state.chip === "Топ" && v.tag === "Топ");
+        return matchesQuery && matchesCategory && matchesChip;
+      });
+    }
+
+    function renderFeature() {
+      var featured = VIDEOS.find(function (v) { return v.featured; }) || VIDEOS[0];
+      featureCard.style.setProperty("--feature-bg", featured.bg);
+      featureTitle.textContent = featured.title;
+      featureMeta.textContent = featured.views + " просмотров";
+      featureDuration.textContent = featured.dur;
+      featureCard.onclick = function () { openModal(featured); };
+      document.getElementById("feature-play").onclick = function (event) {
+        event.stopPropagation();
+        openModal(featured);
+      };
+    }
+
+    function renderMiniList() {
+      miniList.innerHTML = "";
+      var items = VIDEOS.slice(0, 4);
+      items.forEach(function (v) {
+        var item = document.createElement("div");
+        item.className = "mini-item";
+        item.innerHTML = '<div class="mini-thumb" style="background:' + v.bg + '"></div><div><h4>' + v.title + '</h4><small>' + v.views + ' · ' + v.dur + '</small></div><span class="pill">' + (v.hd ? 'HD' : v.tag) + '</span>';
+        item.addEventListener("click", function () { openModal(v); });
+        miniList.appendChild(item);
+      });
+    }
+
+    function render() {
+      renderTabs();
+      renderChips();
+      renderFeature();
+      renderMiniList();
+      var titleText = state.q ? "Результаты: " + state.q : state.cat;
+      document.getElementById("title").textContent = titleText;
+      var list = getFilteredVideos();
+      grid.innerHTML = "";
+
+      if (!list.length) {
+        empty.hidden = false;
+        return;
+      }
+
+      empty.hidden = true;
+      list.forEach(function (v) {
+        var c = document.createElement("button");
+        c.type = "button";
+        c.className = "card";
+        c.innerHTML = [
+          '<div class="thumb" style="background:' + v.bg + '">',
+          '  <span class="thumb-play" aria-hidden="true"></span>',
+          (v.hd ? '<span class="thumb-badge">HD</span>' : ''),
+          '  <span class="thumb-duration">' + v.dur + '</span>',
+          '</div>',
+          '<div class="card-body">',
+          '  <div class="card-meta"><span>' + v.views + '</span><span>' + v.cat + '</span></div>',
+          '  <h3>' + v.title + '</h3>',
+          '  <div class="card-info"><span class="badge-tag">' + (v.tag || 'Топ') + '</span><span>' + v.dur + '</span></div>',
+          '</div>'
+        ].join("");
+        c.addEventListener("click", function () { openModal(v); });
+        grid.appendChild(c);
+      });
+    }
+
+    var dlg = document.getElementById("dlg");
+    function openModal(v) {
+      document.getElementById("pl").style.background = v.bg;
+      document.getElementById("dlg-title").textContent = v.title;
+      document.getElementById("dlg-meta").textContent = v.views + " просмотров · " + v.dur + " · " + v.cat + " · " + (v.hd ? "HD" : v.tag);
+      dlg.showModal();
+    }
+
+    document.getElementById("close").onclick = function () { dlg.close(); };
+    document.getElementById("sf").addEventListener("submit", function (e) {
+      e.preventDefault();
+      state.q = document.getElementById("q").value.trim();
+      render();
+    });
+    document.getElementById("age-confirm").onclick = function () {
+      var gate = document.getElementById("gate");
+      gate.classList.add("hidden");
+      try {
+        sessionStorage.setItem("age18", "1");
+        localStorage.setItem("age18", "1");
+      } catch (e) {}
+    };
+    try {
+      if (sessionStorage.getItem("age18") === "1" || localStorage.getItem("age18") === "1") {
+        document.getElementById("gate").classList.add("hidden");
+      }
+    } catch (e) {}
+
+    render();
+  </script>
+</body>
+</html>
